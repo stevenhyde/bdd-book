@@ -2,11 +2,23 @@
 
 let chai = require('chai'), expect = chai.expect, sinon = require("sinon");
 
+let orderSystemWith = require("../lib/orders");
+
 /* global context */
 // the feature name should follow the format <ROLE> _ <ACTION> _ <ENTITY>
-describe('Customer displays order', () => {
+describe('Customer displays order', function() {
     // now add some scenarios
-    context("Given that the order is empty", () => {
+    context("Given that the order is empty", function() {
+        beforeEach(function() {
+            let orderDAO = {
+                byId : sinon.stub(),
+            },
+            orderSystem = orderSystemWith(orderDAO);
+            
+            orderDAO.byId.withArgs('some empty order id').returns([]);
+            
+            this.result = orderSystem.display('some empty order id');
+        });
         it('will show no order items');
         it('will show 0 as the total price');
         // it('will not be possible to place the order');
