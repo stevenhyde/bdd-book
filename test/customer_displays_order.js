@@ -15,23 +15,31 @@ describe('Customer displays order', function() {
     });
     // now add some scenarios
     context("Given that the order is empty", function() {
-        beforeEach(function() {
+        var result;
+        beforeEach(function(done) {
             this.orderId = 'some empty order id';
-            this.orderDAO.byId.withArgs(this.orderId).returns([]);
-            this.result = this.orderSystem.display('some empty order id');
+            this.orderDAO.byId.withArgs(this.orderId)
+                .callsArgWithAsync(1, null, []);
+                
+            this.orderSystem.display(this.orderId, function(err, res){
+                console.log("Inside tst-callback");
+                result = res;
+                done(err);
+                
+            });
         });
         it('will show no order items', function(){
-            expect(this.result).to.have.property('items').that.is.empty;
+            expect(result).to.have.property('items').that.is.empty;
         });
         it('will show 0 as the total price', function(){
-            expect(this.result).to.have.property('totalPrice').that.is.equal(0);
+            expect(result).to.have.property('totalPrice').that.is.equal(0);
         });
         // it('will not be possible to place the order');
         // it('will be possible to add a bverage');
         // it('will not be possible to remove a beverage');
         // it('will not be possible to change the quantity of the beverage');
         it('will only be possible to add a beverage', function(){
-            expect(this.result).to.have.property('actions').that.is.deep.equal([{
+            expect(result).to.have.property('actions').that.is.deep.equal([{
                     action: 'append-beverage',
                     target: this.orderId,
                     parameters: {
