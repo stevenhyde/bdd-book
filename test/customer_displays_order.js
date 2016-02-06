@@ -15,40 +15,44 @@ describe('Customer displays order', function() {
     });
     // now add some scenarios
     context("Given that the order is empty", function() {
-        var result;
-        beforeEach(function(done) {
-            this.orderId = 'some empty order id';
+        let resultPromise, orderId;
+        beforeEach(function() {
+            orderId = this.orderId = 'some empty order id';
             this.orderDAO.byId.withArgs(this.orderId)
                 .callsArgWithAsync(1, null, []);
                 
             // returns promise now, so we will hook a then function to it
-            this.orderSystem.display(this.orderId).then(function(res){
-                result = res;
-                done();
-            });
+            resultPromise = this.orderSystem.display(this.orderId);
         });
         
         it('will show no order items', function(){
             // in each of the tests, we have to return 
-            expect(result).to.have.property('items').that.is.empty;
+            return resultPromise.then(function(result){
+                expect(result).to.have.property('items').that.is.empty;
+            });
         });
+        
         it('will show 0 as the total price', function(){
-            expect(result).to.have.property('totalPrice').that.is.equal(0);
+            return resultPromise.then(function(result){
+                expect(result).to.have.property('totalPrice').that.is.equal(0);
+            });
         });
         // it('will not be possible to place the order');
         // it('will be possible to add a bverage');
         // it('will not be possible to remove a beverage');
         // it('will not be possible to change the quantity of the beverage');
         it('will only be possible to add a beverage', function(){
-            expect(result).to.have.property('actions').that.is.deep.equal([{
+            return resultPromise.then(function(result){
+                expect(result).to.have.property('actions').that.is.deep.equal([{
                     action: 'append-beverage',
-                    target: this.orderId,
+                    target: orderId,
                     parameters: {
                         beverageRef: null,
                         quantity: 0
                     }
-                }
-            ]);
+                  }
+               ]);
+            });
         }); // this sums up the test cases above into one general case
     });
     
