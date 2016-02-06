@@ -2,6 +2,8 @@
 
 let chai = require('chai'), expect = chai.expect, sinon = require("sinon");
 
+chai.use(require("chai-as-promised"));
+
 let orderSystemWith = require("../lib/orders");
 
 /* global context */
@@ -27,23 +29,18 @@ describe('Customer displays order', function() {
         
         it('will show no order items', function(){
             // in each of the tests, we have to return 
-            return resultPromise.then(function(result){
-                expect(result).to.have.property('items').that.is.empty;
-            });
+            return expect(resultPromise).to.eventually.have.property('items').that.is.empty;
         });
         
         it('will show 0 as the total price', function(){
-            return resultPromise.then(function(result){
-                expect(result).to.have.property('totalPrice').that.is.equal(0);
-            });
+            return expect(resultPromise).to.eventually.have.property('totalPrice').that.is.equal(0);
         });
         // it('will not be possible to place the order');
         // it('will be possible to add a bverage');
         // it('will not be possible to remove a beverage');
         // it('will not be possible to change the quantity of the beverage');
         it('will only be possible to add a beverage', function(){
-            return resultPromise.then(function(result){
-                expect(result).to.have.property('actions').that.is.deep.equal([{
+            return expect(resultPromise).to.eventually.have.property('actions').that.is.deep.equal([{
                     action: 'append-beverage',
                     target: orderId,
                     parameters: {
@@ -52,7 +49,6 @@ describe('Customer displays order', function() {
                     }
                   }
                ]);
-            });
         }); // this sums up the test cases above into one general case
     });
     
