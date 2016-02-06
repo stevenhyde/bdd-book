@@ -24,5 +24,34 @@ module.exports= {
             id : `<non-empty order ${counter}>`,
             data : itemExamples.map(asOrderItem),
         };
+    },
+    actionsFor : function(order){
+        return {
+            removeItem : (idx) => {
+                var item = order.data[idx];
+                return {'action' : 'remove-beverage', 
+                        target : order.id , parameters : {
+                                            beverageRef : item.beverage.id,
+                                        }}
+            },
+            editItemQuantity : (idx) => {
+                var item = order.data[idx];
+                return {'action' : 'edit-beverage', 
+                        target : order.id , parameters : {
+                                            beverageRef : item.beverage.id,
+                                            newQuantity : item.quantity
+                                        }}
+            },
+            appendItem : () => {
+                return {'action' : 'append-beverage', 
+                        target : order.id , parameters : {
+                                            beverageRef : null,
+                                            quantity : 0
+                                        }}
+            },
+            place : () => {
+                return {'action' : 'place-order', target : order.id }
+            }
+        }
     }
 }

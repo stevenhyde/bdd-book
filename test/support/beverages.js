@@ -16,4 +16,12 @@ module.exports = {
             price : 2.3,
         }
     },
+    
+    capuccino : function(){ 
+        return {
+            id : "capuccino id",
+            name : "capuccino",
+            price : 2.0,
+        }
+    },
 }
