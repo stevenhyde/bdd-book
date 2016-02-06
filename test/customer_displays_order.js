@@ -6,7 +6,8 @@ let newStorage = require("./support/storageDouble");
 
 chai.use(require("chai-as-promised"));
 
-let orderSystemWith = require("../lib/orders");
+let orderSystemWith = require("../lib/orders"),
+    orderFactory = require("./support/orders");
 
 /* global context */
 // the feature name should follow the format <ROLE> _ <ACTION> _ <ENTITY>
@@ -19,10 +20,7 @@ describe('Customer displays order', function() {
     context("Given that the order is empty", function() {
         let resultPromise, order;
         beforeEach(function() {
-            order = this.order = this.orderStorage.alreadyContains({
-                    id : 'some empty order id',
-                    data : []
-            });
+            order = this.order = this.orderStorage.alreadyContains(orderFactory.empty());
             resultPromise = this.orderSystem.display(this.order.id);
         });
         
@@ -34,10 +32,7 @@ describe('Customer displays order', function() {
         it('will show 0 as the total price', function(){
             return expect(resultPromise).to.eventually.have.property('totalPrice').that.is.equal(0);
         });
-        // it('will not be possible to place the order');
-        // it('will be possible to add a bverage');
-        // it('will not be possible to remove a beverage');
-        // it('will not be possible to change the quantity of the beverage');
+        
         it('will only be possible to add a beverage', function(){
             return expect(resultPromise).to.eventually.have.property('actions').that.is.deep.equal([{
                     action: 'append-beverage',
@@ -54,21 +49,12 @@ describe('Customer displays order', function() {
     context("Given that the order contains beverages", () => {
         let resultPromise, order;
         beforeEach(function() {
-            this.expresso =  {  id: "expresso id",
-                                name: "Expresso",
-                                price: 1.50
-                              };
-            this.mocaccino = {  id: "mocaccino id",
-                                name: "Mocaccino",
-                                price: 2.30
-                             };
 
-            order = this.order = this.orderStorage.alreadyContains( { id : 'some non empty order id',
-                                    data : [
-                                       { beverage : this.expresso , quantity : 1},
-                                       { beverage : this.mocaccino , quantity : 2},
+            order = this.order = this.orderStorage.alreadyContains( orderFactory.withItems([
+                                       { beverage : 'expresso' , quantity : 1},
+                                       { beverage : 'mocaccino' , quantity : 2},
                                     ]
-                                });
+                                ));
             
             // returns promise now, so we will hook a then function to it
             resultPromise = this.orderSystem.display(this.order.id);
