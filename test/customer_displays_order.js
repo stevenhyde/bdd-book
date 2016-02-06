@@ -7,7 +7,8 @@ let newStorage = require("./support/storageDouble");
 chai.use(require("chai-as-promised"));
 
 let orderSystemWith = require("../lib/orders"),
-    orderFactory = require("./support/orders");
+    orderFactory = require("./support/orders"),
+    beverages = require("./support/beverages");
 
 /* global context */
 // the feature name should follow the format <ROLE> _ <ACTION> _ <ENTITY>
@@ -66,10 +67,47 @@ describe('Customer displays order', function() {
         it('will show the sum of the unit prices as total price', function(){
             return expect(resultPromise).to.eventually.have.property('totalPrice').that.is.equal(6.1);
         });
-        it('will be possible to place the order');
-        it('will be possible to add a bverage');
-        it('will be possible to remove a beverage');
-        it('will be possible to change the quantity of the beverage');
+        it('will be possible to place the order', function() {
+            return expect(resultPromise).to.eventually.have.property('actions')
+                        .that.include({'action' : 'place-order', target : order.id });
+        });
+        it('will be possible to add a bverage', function() {
+            return expect(resultPromise).to.eventually.have.property('actions')
+                        .that.include({'action' : 'append-beverage', 
+                                        target : order.id,
+                                        parameters : {
+                                            beverageRef : null,
+                                            quantity : 0,
+                                        }});
+        });
+        it('will be possible to remove a beverage', function() {
+            return expect(resultPromise).to.eventually.have.property('actions')
+                        .that.include({'action' : 'remove-beverage', 
+                                        target : order.id,
+                                        parameters : {
+                                            beverageRef : beverages.expresso().id,
+                                        }})
+                        .and.that.include({'action' : 'remove-beverage', 
+                                        target : order.id,
+                                        parameters : {
+                                            beverageRef : beverages.mocaccino().id,
+                                        }})
+        });
+        it('will be possible to change the quantity of the beverage', function() {
+            return expect(resultPromise).to.eventually.have.property('actions')
+                        .that.include({'action' : 'edit-beverage', 
+                                        target : order.id,
+                                        parameters : {
+                                            beverageRef : beverages.expresso().id,
+                                            newQuantity : 1,
+                                        }})
+                        .and.that.include({'action' : 'edit-beverage', 
+                                        target : order.id,
+                                        parameters : {
+                                            beverageRef : beverages.mocaccino().id,
+                                            newQuantity : 2,
+                                        }})
+        });
     });
     
     // the order can have messages, that it might show to the user
