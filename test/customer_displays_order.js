@@ -21,14 +21,15 @@ describe('Customer displays order', function() {
             this.orderDAO.byId.withArgs(this.orderId)
                 .callsArgWithAsync(1, null, []);
                 
-            this.orderSystem.display(this.orderId, function(err, res){
-                console.log("Inside tst-callback");
+            // returns promise now, so we will hook a then function to it
+            this.orderSystem.display(this.orderId).then(function(res){
                 result = res;
-                done(err);
-                
+                done();
             });
         });
+        
         it('will show no order items', function(){
+            // in each of the tests, we have to return 
             expect(result).to.have.property('items').that.is.empty;
         });
         it('will show 0 as the total price', function(){
